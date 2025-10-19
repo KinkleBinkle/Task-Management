@@ -34,3 +34,4 @@ pip-wheel-metadata/
 
 # --- Cache ---
 .pytest_cache/
+__pycache__
