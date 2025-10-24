@@ -1,15 +1,14 @@
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine
-from sqlalchemy.orm import declarative_base
+from database import engine, Base
+from admin import adminRoutes
 
-
-Base = declarative_base()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn: 
+    async with engine.begin() as conn:
+        # Create all tables for the shared Base metadata (no-op if already exists).
         await conn.run_sync(Base.metadata.create_all)
     yield
     # Cleanup (optional)
@@ -31,3 +30,7 @@ app.add_middleware(
 @app.get("/")
 async def read_root():
     return{"message": "Task Management & Collaboration"}
+
+# Include router 
+
+app.include_router(adminRoutes.router, prefix="/admin", tags=["Admin"])
