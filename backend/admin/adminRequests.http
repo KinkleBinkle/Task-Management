@@ -1,3 +1,0 @@
-### request to get all admin requests
-GET http://localhost:8000/admin
-Accept: application/json
