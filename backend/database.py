@@ -7,6 +7,10 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Convert postgresql:// to postgresql+asyncpg:// for async support
+if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 # Shared declarative base for all models in the project. Import this Base
 # from other modules so that metadata.create_all() sees every model.
 Base = declarative_base()
