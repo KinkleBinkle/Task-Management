@@ -26,3 +26,79 @@ class UserResponse(UserBase):
 class UserLogin(BaseModel):
     username : str
     password : str
+
+### project schemas
+
+class ProjectBase(BaseModel):
+    name : str
+    description : Optional[str] = None
+
+class ProjectCreate(ProjectBase):
+    pass
+
+class ProjectUpdate(BaseModel):
+    name : Optional[str] = None
+    description : Optional[str] = None
+
+class ProjectMemberInfo(BaseModel):
+    id : int
+    user_id : int
+    username : str
+    name : str
+    role : ProjectRole
+
+    class Config:
+        from_attributes = True
+
+class UserSimple(BaseModel):
+    id : int
+    username : str
+    name : str
+
+    class Config:
+        from_attributes = True
+
+class ProjectResponse(ProjectBase):
+    id : int 
+    owner_id : int
+    owner : UserSimple
+    created_at : datetime
+    updated_at : datetime
+    members : List[ProjectMemberInfo] = []
+
+    class config:
+        orm_mode = True
+        from_attributes = True
+
+class ProjectListResponse(BaseModel):
+    id : int
+    owner_id : int
+    owner_name : str
+    created_at : datetime
+    task_count : Optional[int] = None
+    member_count : Optional[int] = None
+
+    class Config:
+
+        from_attributes = True
+
+### project member schemas
+
+class ProjectMemberAdd(BaseModel):
+    user_id : int
+    role : ProjectRole = ProjectRole.MEMBER
+
+class ProjectMemberUpdate(BaseModel):
+    role : ProjectRole
+
+class ProjectMemberResponse(BaseModel):
+    id : int
+    project_id : int
+    user_id : int
+    role : ProjectRole
+    user : UserSimple
+    joined_at : datetime
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
