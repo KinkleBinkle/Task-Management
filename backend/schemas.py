@@ -8,6 +8,7 @@ from models import ProjectRole, TaskStatus
 class UserBase(BaseModel):
     name : str
     username : str
+    email : EmailStr
 
 class UserCreate(UserBase):
     password : str

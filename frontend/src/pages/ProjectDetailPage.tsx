@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import apiClient from '../api/client';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import apiClient from "../api/client";
 
 interface Task {
   id: number;
   title: string;
   description?: string;
-  status: 'To Do' | 'In Progress' | 'Done';
+  status: "To Do" | "In Progress" | "Done";
   assignee_id?: number;
   created_at: string;
   updated_at: string;
@@ -37,11 +37,11 @@ export const ProjectDetailPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
-  const [taskTitle, setTaskTitle] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
-  const [taskAssignee, setTaskAssignee] = useState('');
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskAssignee, setTaskAssignee] = useState("");
 
   useEffect(() => {
     if (projectId) {
@@ -61,7 +61,7 @@ export const ProjectDetailPage: React.FC = () => {
         setTasks(data.tasks);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load project');
+      setError(err.message || "Failed to load project");
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export const ProjectDetailPage: React.FC = () => {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const newTask = await apiClient.createTask(
@@ -79,32 +79,38 @@ export const ProjectDetailPage: React.FC = () => {
         taskAssignee ? parseInt(taskAssignee) : undefined
       );
       setTasks([...tasks, newTask]);
-      setTaskTitle('');
-      setTaskDescription('');
-      setTaskAssignee('');
+      setTaskTitle("");
+      setTaskDescription("");
+      setTaskAssignee("");
       setShowCreateTaskModal(false);
     } catch (err: any) {
-      setError(err.message || 'Failed to create task');
+      setError(err.message || "Failed to create task");
     }
   };
 
   const handleUpdateTaskStatus = async (taskId: number, newStatus: string) => {
     try {
-      await apiClient.updateTask(parseInt(projectId!), taskId, { status: newStatus });
-      setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus as any } : t));
+      await apiClient.updateTask(parseInt(projectId!), taskId, {
+        status: newStatus,
+      });
+      setTasks(
+        tasks.map((t) =>
+          t.id === taskId ? { ...t, status: newStatus as any } : t
+        )
+      );
     } catch (err: any) {
-      setError(err.message || 'Failed to update task');
+      setError(err.message || "Failed to update task");
     }
   };
 
   const handleDeleteTask = async (taskId: number) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
       await apiClient.deleteTask(parseInt(projectId!), taskId);
-      setTasks(tasks.filter(t => t.id !== taskId));
+      setTasks(tasks.filter((t) => t.id !== taskId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete task');
+      setError(err.message || "Failed to delete task");
     }
   };
 
@@ -116,14 +122,16 @@ export const ProjectDetailPage: React.FC = () => {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate("/dashboard")}
             className="text-blue-500 hover:underline mb-2"
           >
             ← Back to Dashboard
           </button>
           {project && (
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {project.name}
+              </h1>
               {project.description && (
                 <p className="text-gray-600 mt-2">{project.description}</p>
               )}
@@ -160,9 +168,11 @@ export const ProjectDetailPage: React.FC = () => {
 
               {/* Task Columns */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {['To Do', 'In Progress', 'Done'].map((status) => (
+                {["To Do", "In Progress", "Done"].map((status) => (
                   <div key={status} className="bg-gray-100 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-800 mb-4">{status}</h3>
+                    <h3 className="font-semibold text-gray-800 mb-4">
+                      {status}
+                    </h3>
                     <div className="space-y-3">
                       {tasks
                         .filter((t) => t.status === status)
@@ -171,7 +181,9 @@ export const ProjectDetailPage: React.FC = () => {
                             key={task.id}
                             className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
                           >
-                            <h4 className="font-semibold text-gray-800">{task.title}</h4>
+                            <h4 className="font-semibold text-gray-800">
+                              {task.title}
+                            </h4>
                             {task.description && (
                               <p className="text-sm text-gray-600 mt-2 line-clamp-2">
                                 {task.description}
@@ -179,11 +191,17 @@ export const ProjectDetailPage: React.FC = () => {
                             )}
                             {isOwner && (
                               <div className="flex space-x-2 mt-3">
-                                {status !== 'Done' && (
+                                {status !== "Done" && (
                                   <button
                                     onClick={() => {
-                                      const nextStatus = status === 'To Do' ? 'In Progress' : 'Done';
-                                      handleUpdateTaskStatus(task.id, nextStatus);
+                                      const nextStatus =
+                                        status === "To Do"
+                                          ? "In Progress"
+                                          : "Done";
+                                      handleUpdateTaskStatus(
+                                        task.id,
+                                        nextStatus
+                                      );
                                     }}
                                     className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded"
                                   >
@@ -215,10 +233,17 @@ export const ProjectDetailPage: React.FC = () => {
                 ) : (
                   <ul className="space-y-4">
                     {members.map((member) => (
-                      <li key={member.id} className="flex justify-between items-center">
+                      <li
+                        key={member.id}
+                        className="flex justify-between items-center"
+                      >
                         <div>
-                          <p className="font-semibold text-gray-800">{member.name}</p>
-                          <p className="text-sm text-gray-600">@{member.username}</p>
+                          <p className="font-semibold text-gray-800">
+                            {member.name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            @{member.username}
+                          </p>
                         </div>
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                           {member.role}
@@ -235,8 +260,8 @@ export const ProjectDetailPage: React.FC = () => {
 
       {/* Create Task Modal */}
       {showCreateTaskModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 w-full max-w-lg">
             <h2 className="text-2xl font-bold mb-6">Create New Task</h2>
 
             <form onSubmit={handleCreateTask}>

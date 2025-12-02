@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import apiClient from '../api/client';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import apiClient from "../api/client";
 
 interface User {
   id: number;
@@ -12,18 +18,25 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  register: (username: string, name: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (token) {
       apiClient.setToken(token);
       fetchCurrentUser();
@@ -37,8 +50,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const currentUser = await apiClient.getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Failed to fetch current user:', error);
-      localStorage.removeItem('access_token');
+      console.error("Failed to fetch current user:", error);
+      localStorage.removeItem("access_token");
     } finally {
       setLoading(false);
     }
@@ -58,9 +71,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const register = async (username: string, name: string, password: string) => {
+  const register = async (
+    username: string,
+    name: string,
+    email: string,
+    password: string
+  ) => {
     try {
-      const newUser = await apiClient.register(username, name, password);
+      const newUser = await apiClient.register(username, name, password, email);
       setUser(newUser);
     } catch (error) {
       throw error;
@@ -91,7 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

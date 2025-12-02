@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useProject } from '../context/ProjectContext';
-import apiClient from '../api/client';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useProject } from "../context/ProjectContext";
+import apiClient from "../api/client";
 
 interface Project {
   id: number;
@@ -22,13 +22,13 @@ export const DashboardPage: React.FC = () => {
   const [projects, setLocalProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [error, setError] = useState('');
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
     } else {
       fetchProjects();
     }
@@ -41,7 +41,7 @@ export const DashboardPage: React.FC = () => {
       setLocalProjects(data);
       setProjects(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to load projects');
+      setError(err.message || "Failed to load projects");
     } finally {
       setLoading(false);
     }
@@ -49,23 +49,26 @@ export const DashboardPage: React.FC = () => {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const newProject = await apiClient.createProject(projectName, projectDescription);
+      const newProject = await apiClient.createProject(
+        projectName,
+        projectDescription
+      );
       addProject(newProject);
       setLocalProjects([...projects, newProject]);
-      setProjectName('');
-      setProjectDescription('');
+      setProjectName("");
+      setProjectDescription("");
       setShowCreateModal(false);
     } catch (err: any) {
-      setError(err.message || 'Failed to create project');
+      setError(err.message || "Failed to create project");
     }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleProjectClick = (projectId: number) => {
@@ -115,7 +118,9 @@ export const DashboardPage: React.FC = () => {
           </div>
         ) : projects.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">No projects yet. Create one to get started!</p>
+            <p className="text-gray-600">
+              No projects yet. Create one to get started!
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -126,10 +131,10 @@ export const DashboardPage: React.FC = () => {
                 className="bg-white rounded-lg shadow hover:shadow-lg cursor-pointer transition p-6"
               >
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {project.name || 'Untitled Project'}
+                  {project.name || "Untitled Project"}
                 </h3>
                 <p className="text-gray-600 mb-4 line-clamp-2">
-                  {project.description || 'No description'}
+                  {project.description || "No description"}
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>👥 {project.member_count || 0} members</span>
@@ -146,8 +151,8 @@ export const DashboardPage: React.FC = () => {
 
       {/* Create Project Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 w-full max-w-lg">
             <h2 className="text-2xl font-bold mb-6">Create New Project</h2>
 
             <form onSubmit={handleCreateProject}>
