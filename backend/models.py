@@ -1,11 +1,11 @@
 from xmlrpc.client import Boolean
 from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime, Text
-from sqlalcemy.orm import relationship
+from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime
 import enum
 
-class Projectrole(str, enum.Enum):
+class ProjectRole(str, enum.Enum):
     OWNER = "owner"
     ADMIN = "admin"
     MEMBER = "member"
@@ -34,7 +34,8 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    role = Column(Enum(Projectrole), default=Projectrole.MEMBER)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
 ### relationships
     owner = relationship("user", foreign_keys=[owner_id])
@@ -47,7 +48,8 @@ class ProjectMember(Base):
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    role = Column(Enum(Projectrole), default=Projectrole.MEMBER, nullable=False)
+    role = Column(Enum(ProjectRole), default=ProjectRole.MEMBER, nullable=False)
+    joined_at = Column(DateTime, default=datetime.utcnow)
     
     ### relationships
     project = relationship("Project", back_populates="members")

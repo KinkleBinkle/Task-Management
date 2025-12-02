@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
-from admin import adminRoutes
+import userRoutes
+import projectRoutes
+import taskRoutes
 
 
 @asynccontextmanager
@@ -20,7 +22,7 @@ app = FastAPI(lifespan=lifespan)
 # CORS settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # or specify e.g. ["http://localhost:5173"]
+    allow_origins=["*"],   # or specify e.g. ["http://localhost:5174"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,8 +31,9 @@ app.add_middleware(
 # Root
 @app.get("/")
 async def read_root():
-    return{"message": "Task Management & Collaboration"}
+    return {"message": "Task Management & Collaboration"}
 
-# Include router 
-
-app.include_router(adminRoutes.router, prefix="/admin", tags=["Admin"])
+# Include routers
+app.include_router(userRoutes.router, prefix="/users", tags=["Users"])
+app.include_router(projectRoutes.router, prefix="/projects", tags=["Projects"])
+app.include_router(taskRoutes.router, prefix="/tasks", tags=["Tasks"])
