@@ -5,11 +5,11 @@ from database import get_db
 from models import User
 from typing import List
 from auth import get_password_hash, verify_password, create_access_token, get_current_user_with_db
-from schemas import UserCreate, UserResponse
+from schemas import UserCreate, UserResponse, UserLogin
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(user_data: UserCreate, db:AsyncSession=Depends(get_db)):
     result = await db.execute(select(User).where(User.username == user_data.username))
     if result.scalar_one_or_none():
@@ -19,10 +19,19 @@ async def register_user(user_data: UserCreate, db:AsyncSession=Depends(get_db)):
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
-    return new_user
+    
+    # Auto-login: create access token
+    access_token = create_access_token(data={"sub": str(new_user.id)})
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "user_id": new_user.id, 
+        "username": new_user.username,
+        "name": new_user.name
+    }
 
 @router.post("/login")
-async def login_user(user_data: UserCreate, db:AsyncSession=Depends(get_db)):
+async def login_user(user_data: UserLogin, db:AsyncSession=Depends(get_db)):
     result = await db.execute(select(User).where(User.username == user_data.username))
     existing_user = result.scalar_one_or_none()
     if existing_user is None or not verify_password(user_data.password, existing_user.password):
@@ -32,7 +41,13 @@ async def login_user(user_data: UserCreate, db:AsyncSession=Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(data={"sub": str(existing_user.id)})
-    return {"access_token": access_token, "token_type": "bearer", "user_id": existing_user.id, "username": existing_user.username}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "user_id": existing_user.id, 
+        "username": existing_user.username,
+        "name": existing_user.name
+    }
 
 @router.post("/me", response_model=UserResponse)
 async def get_current_user_with_info(current_user: User = Depends(get_current_user_with_db), db: AsyncSession = Depends(get_db)):

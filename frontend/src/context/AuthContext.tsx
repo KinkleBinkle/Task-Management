@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser({
         id: response.user_id,
         username: response.username,
-        name: response.username,
+        name: response.name,
       });
     } catch (error) {
       throw error;
@@ -78,8 +78,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     password: string
   ) => {
     try {
-      const newUser = await apiClient.register(username, name, password, email);
-      setUser(newUser);
+      const response: any = await apiClient.register(
+        username,
+        name,
+        password,
+        email
+      );
+      apiClient.setToken(response.access_token);
+      setUser({
+        id: response.user_id,
+        username: response.username,
+        name: response.name,
+      });
     } catch (error) {
       throw error;
     }

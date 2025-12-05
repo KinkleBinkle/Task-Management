@@ -57,13 +57,15 @@ def decode_access_token(token: str) -> dict:
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: AsyncSession = Depends(None)):
     token = credentials.credentials
     payload = decode_access_token(token)
-    user_id:int = payload.get("sub")
-    if user_id is None:
+    user_id_str = payload.get("sub")
+    if user_id_str is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    user_id = int(user_id_str)
     
     if db is None:
         async for session in get_db():
@@ -83,13 +85,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 async def get_current_user_with_db(db: AsyncSession = Depends(get_db), credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     payload = decode_access_token(token)
-    user_id:int = payload.get("sub")
-    if user_id is None:
+    user_id_str = payload.get("sub")
+    if user_id_str is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    user_id = int(user_id_str)
     
     result = await db.execute(select(User).where(User.id == user_id))
     current_user = result.scalar_one_or_none()
