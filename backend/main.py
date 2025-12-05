@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from database import engine, Base
 import userRoutes
 import projectRoutes
@@ -12,6 +13,19 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         # Create all tables for the shared Base metadata (no-op if already exists).
         await conn.run_sync(Base.metadata.create_all)
+        # Ensure `email` column exists on `users` table (safe for dev migrations).
+        try:
+            await conn.execute(text("""
+                ALTER TABLE users
+                ADD COLUMN IF NOT EXISTS email VARCHAR
+            """))
+            # Create unique index if not exists (model expects unique index)
+            await conn.execute(text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS ix_users_email ON users (email)
+            """))
+        except Exception:
+            # If anything goes wrong here, don't prevent the app from starting.
+            pass
     yield
     # Cleanup (optional)
     # async with engine.begin() as conn:
