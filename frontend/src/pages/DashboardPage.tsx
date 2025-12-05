@@ -37,7 +37,7 @@ export const DashboardPage: React.FC = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const data = await apiClient.listProjects(user?.id);
+      const data = await apiClient.listProjects();
       setLocalProjects(data);
       setProjects(data);
     } catch (err: any) {

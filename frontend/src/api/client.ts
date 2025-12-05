@@ -106,9 +106,8 @@ class ApiClient {
     return this.request("/projects/", "POST", { name, description });
   }
 
-  async listProjects(userId?: number) {
-    const endpoint = userId ? `/projects/?user_id=${userId}` : "/projects/";
-    return this.request(endpoint);
+  async listProjects() {
+    return this.request("/projects/");
   }
 
   async getProject(projectId: number) {
@@ -116,7 +115,7 @@ class ApiClient {
   }
 
   async updateProject(projectId: number, data: Record<string, any>) {
-    return this.request(`/projects/${projectId}`, "PATCH", data);
+    return this.request(`/projects/${projectId}`, "PUT", data);
   }
 
   async deleteProject(projectId: number) {
@@ -143,7 +142,7 @@ class ApiClient {
   }
 
   async updateProjectMember(projectId: number, memberId: number, role: string) {
-    return this.request(`/projects/${projectId}/members/${memberId}`, "PATCH", {
+    return this.request(`/projects/${projectId}/members/${memberId}`, "PUT", {
       role,
     });
   }
@@ -182,7 +181,7 @@ class ApiClient {
   }
 
   async updateTask(taskId: number, data: Record<string, any>) {
-    return this.request(`/tasks/${taskId}`, "PATCH", data);
+    return this.request(`/tasks/${taskId}`, "PUT", data);
   }
 
   async deleteTask(taskId: number) {
