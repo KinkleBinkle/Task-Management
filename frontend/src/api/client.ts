@@ -40,6 +40,8 @@ class ApiClient {
     const options: RequestInit = {
       method,
       headers: this.getHeaders(),
+      credentials: "include",
+      mode: "cors",
     };
 
     if (body) {
@@ -80,7 +82,7 @@ class ApiClient {
   }
 
   async getCurrentUser() {
-    return this.request("/users/me", "GET");
+    return this.request("/users/me", "POST");
   }
 
   async getUser(userId: number) {

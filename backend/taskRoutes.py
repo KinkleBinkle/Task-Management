@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from models import Task, user
+from models import Task, User
 from typing import List
 from auth import get_current_user_with_db
 from schemas import TaskCreate, TaskUpdate, TaskResponse
@@ -10,7 +10,7 @@ from schemas import TaskCreate, TaskUpdate, TaskResponse
 router = APIRouter()
 
 @router.post("/{project_id}/tasks/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
-async def create_task(project_id: int, task_data: TaskCreate, db: AsyncSession = Depends(get_db), current_user: user = Depends(get_current_user_with_db)):
+async def create_task(project_id: int, task_data: TaskCreate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user_with_db)):
     new_task = Task(
         project_id=project_id,
         title=task_data.title,
@@ -29,7 +29,7 @@ async def get_project_tasks(project_id: int, db: AsyncSession = Depends(get_db))
     return tasks
 
 @router.put("/{project_id}/tasks/{task_id}", response_model=TaskResponse)
-async def update_task(project_id: int, task_id: int, task_data: TaskUpdate, db: AsyncSession = Depends(get_db), current_user: user = Depends(get_current_user_with_db)):
+async def update_task(project_id: int, task_id: int, task_data: TaskUpdate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user_with_db)):
     result = await db.execute(select(Task).where(Task.id == task_id, Task.project_id == project_id))
     task = result.scalar_one_or_none()
     if task is None:
@@ -44,7 +44,7 @@ async def update_task(project_id: int, task_id: int, task_data: TaskUpdate, db: 
     return task
 
 @router.delete("/{project_id}/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(project_id: int, task_id: int, db: AsyncSession = Depends(get_db), current_user: user = Depends(get_current_user_with_db)):
+async def delete_task(project_id: int, task_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user_with_db)):
     result = await db.execute(select(Task).where(Task.id == task_id, Task.project_id == project_id))
     task = result.scalar_one_or_none()
     if task is None:

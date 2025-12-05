@@ -15,16 +15,17 @@ class TaskStatus(str, enum.Enum):
     IN_PROGRESS = "In Progress"
     DONE = "Done"
 
-class user(Base):
+class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=True)
     password = Column(String, nullable=False)
 
 ### relationships 
-    project_membership = relationship("Project", back_populates="user", cascade="all, delete-orphan")
+    project_membership = relationship("ProjectMember", back_populates="user", cascade="all, delete-orphan")
     assigned_tasks = relationship("Task", back_populates="assignee")
 
 class Project(Base):
@@ -38,7 +39,7 @@ class Project(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
 ### relationships
-    owner = relationship("user", foreign_keys=[owner_id])
+    owner = relationship("User", foreign_keys=[owner_id])
     members = relationship("ProjectMember", back_populates="project", cascade="all, delete-orphan")
     tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
 
@@ -53,7 +54,7 @@ class ProjectMember(Base):
     
     ### relationships
     project = relationship("Project", back_populates="members")
-    user = relationship("user", back_populates="project_membership")
+    user = relationship("User", back_populates="project_membership")
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -73,4 +74,4 @@ class Task(Base):
     
     ### relationships
     project = relationship("Project", back_populates="tasks")
-    assignee = relationship("user", back_populates="assigned_tasks")
+    assignee = relationship("User", back_populates="assigned_tasks")
